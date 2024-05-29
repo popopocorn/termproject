@@ -49,8 +49,8 @@ class mainGUI():
         lab6 = Label(self.frame1, width=64, height=64, bg='black')
         lab6.place(x=10, y=530)
 
-        self.frame2 = Frame(self.notebook, width=350, height=700, bg='black')
-        self.frame2.place(x=420, y=10)
+        self.frame2 = Frame(self.notebook, width=350, height=685, bg='black')
+        self.frame2.place(x=420, y=25)
 
         self.status = {'crt': 0, 'spc': 0, 'swf': 0, 'dom': 0, 'end': 0, 'exp': 0, 'hp': 0, 'atk': 0}
         self.tendency = {'kind': 0, 'cour': 0, 'charm': 0, 'intel': 0}
@@ -128,10 +128,10 @@ class mainGUI():
                                     fg='light gray', bg='black')
         self.labels['kind'].place(x=270, y=640)
 
-        self.frame3 = Frame(self.notebook, width=490, height=700)
-        self.frame3.place(x=780, y=10)
+        self.frame3 = Frame(self.notebook, width=490, height=685)
+        self.frame3.place(x=780, y=25)
 
-        self.char_image_canvas = Canvas(self.frame3, width=490, height=700, bg='black')
+        self.char_image_canvas = Canvas(self.frame3, width=490, height=685, bg='black')
         self.char_image_canvas.pack()
         #---------------------------------------------------------------------------------------
         #캐릭터 검색 notebook 끝
@@ -179,7 +179,7 @@ class mainGUI():
         # ---------------------------------------------------------------------------------------
 
         self.window.mainloop()
-
+    #유저 이름 받기
     def get_name(self):
         self.name = str(self.name_var.get())
         profile = get_profiles(self.name)
@@ -202,22 +202,53 @@ class mainGUI():
             self.vars[k].set(v)
         for k, v in self.tendency.items():
             self.vars[k].set(v)
+    #아이템 정보 표시#
     def draw_info(self, item_id):
         url = "https://developer-lostark.game.onstove.com/markets/items/" + item_id
         response = requests.get(url, headers=headers)
         data = response.json()
         price_by_day = data[0]["Stats"]
-        price={}
+        price = {}
         self.mapc.delete("all")
-        for day in range(7):
-            price[price_by_day[day]["Date"]] = price_by_day[day]["AvgPrice"]
 
-        x = 50
-        y = 50
-        for date, avg_price in price.items():
-            text = f"{date}: {avg_price}"  # 표시할 텍스트 내용
-            self.mapc.create_text(x, y, text=text, anchor=W)  # 텍스트를 캔버스에 그림
-            y += 20
+        for day in range(7):
+            price[price_by_day[day]["Date"]] = float(price_by_day[day]["AvgPrice"])
+
+        max_price = max(price.values())
+        min_price = min(price.values())
+        price_range = max_price - min_price
+
+        width = 1020
+        height = 570
+        x_spacing = width / 8  # 공간을 나누기 위해 8로 나눔
+        y_offset = 500  # 그래프의 y 축 기준선
+        i = 0
+
+        previous_x, previous_y = None, None
+
+        for date, avg_price in sorted(price.items()):
+            x = x_spacing * (i + 1)
+
+
+            normalized_price = (avg_price - min_price) / price_range if price_range != 0 else 0
+            heightspot = normalized_price * height * 0.3
+            y = y_offset - heightspot
+
+            # 날짜를 캔버스 아래에 표시
+            self.mapc.create_text(x, y_offset + 20, text=date, anchor=N, fill="black")  # 날짜 표시
+            # 가격을 캔버스 세로로 표시
+            self.mapc.create_text(x, y - 20, text=f"{avg_price:.2f}", anchor=S, fill="black")  # 가격 표시
+            self.mapc.create_oval(x - 5, y - 5, x + 5, y + 5, fill="orange")  # 지름 10짜리 원
+
+            if previous_x is not None and previous_y is not None:
+                self.mapc.create_line(previous_x, previous_y, x, y, fill="orange")  # 이전 점과 현재 점을 선으로 연결
+
+            previous_x, previous_y = x, y
+            i += 1
+
+    # 나머지 mainGUI 클래스는 동일
+
+    #선택된 아이템 표시
     def show_selected_item(self, event):
         selected_index = self.item_info_listbox.curselection()
         if selected_index:

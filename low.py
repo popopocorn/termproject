@@ -137,8 +137,8 @@ class mainGUI():
                                     fg='light gray', bg='black')
         self.labels['kind'].place(x=270, y=640)
 
-        self.frame3 = Frame(self.notebook, width=400, height=685)
-        self.frame3.place(x=930, y=25)
+        self.frame3 = Frame(self.notebook, width=340, height=685, bg='black')
+        self.frame3.place(x=926, y=25)
 
         self.char_image_canvas = Canvas(self.frame3, width=340, height=685, bg='black')
         self.char_image_canvas.pack()

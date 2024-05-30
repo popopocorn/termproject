@@ -32,7 +32,7 @@ class mainGUI():
         button = Button(frame0, text='검색', bg='white', foreground='black', width=9, height=2, command=self.get_name)
         button.place(x=330)
 
-        self.frame1 = Frame(self.notebook, width=400, height=650, bg='black')
+        self.frame1 = Frame(self.notebook, width=550, height=650, bg='black')
         self.frame1.place(x=10, y=60)
 
         self.equipment_img_labels = []
@@ -46,20 +46,20 @@ class mainGUI():
 
             self.equipment_name_text_variables.append(StringVar())
             self.equipment_name_text_variables[i].set('')
-            self.equipment_name_labels.append(Label(self.frame1, width=40, height=1, bg='black', fg='white',
-                                                    font=('Arial', 14, 'bold'), anchor='w',
+            self.equipment_name_labels.append(Label(self.frame1, width=15, height=1, bg='black', fg='white',
+                                                    font=('Arial', 12, 'bold'), anchor='w',
                                                     textvariable=self.equipment_name_text_variables[i]))
             self.equipment_name_labels[i].place(x=100, y=30+100*i)
 
             self.equipment_quality_variables.append(IntVar())
             self.equipment_quality_variables[i].set(0)
             self.equipment_quality_labels.append(Label(self.frame1, width=10, bg='black', fg='black',
-                                                       font=('Arial', 12, 'bold'),
+                                                       font=('Arial', 10, 'bold'),
                                                        textvariable=self.equipment_quality_variables[i]))
             self.equipment_quality_labels[i].place(x=100, y=60 + 100 * i)
 
         self.frame2 = Frame(self.notebook, width=350, height=685, bg='black')
-        self.frame2.place(x=420, y=25)
+        self.frame2.place(x=570, y=25)
 
         self.status = {'crt': 0, 'spc': 0, 'swf': 0, 'dom': 0, 'end': 0, 'exp': 0, 'hp': 0, 'atk': 0}
         self.tendency = {'kind': 0, 'cour': 0, 'charm': 0, 'intel': 0}
@@ -137,10 +137,10 @@ class mainGUI():
                                     fg='light gray', bg='black')
         self.labels['kind'].place(x=270, y=640)
 
-        self.frame3 = Frame(self.notebook, width=490, height=685)
-        self.frame3.place(x=780, y=25)
+        self.frame3 = Frame(self.notebook, width=400, height=685)
+        self.frame3.place(x=930, y=25)
 
-        self.char_image_canvas = Canvas(self.frame3, width=490, height=685, bg='black')
+        self.char_image_canvas = Canvas(self.frame3, width=340, height=685, bg='black')
         self.char_image_canvas.pack()
         # ---------------------------------------------------------------------------------------
         # 캐릭터 검색 notebook 끝
@@ -203,7 +203,7 @@ class mainGUI():
         temp_label = Label(self.frame3, image=img)
         temp_label.image = img
         self.char_image_canvas.delete('img')
-        self.char_image_canvas.create_image(245, 350, image=img, tags='img')
+        self.char_image_canvas.create_image(185, 330, image=img, tags='img')
 
         self.status = profile['status']
         self.tendency = profile['tendency']

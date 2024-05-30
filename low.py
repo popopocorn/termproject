@@ -25,12 +25,12 @@ class mainGUI():
         # 캐릭터의 이름을 입력할 Entry와 이름을 저장하고 있을 Variable
         self.name_var = StringVar()
         ent = Entry(frame0, width=44, textvariable=self.name_var, relief='solid', borderwidth=10)
-        ent.place(x=0, y=0)
+        ent.place(x=9, y=0)
 
         self.name = ''
         # 캐릭터의 이름을 받아올 버튼
         button = Button(frame0, text='검색', bg='white', foreground='black', width=9, height=2, command=self.get_name)
-        button.place(x=330)
+        button.place(x=340)
 
         self.frame1 = Frame(self.notebook, width=550, height=650, bg='black')
         self.frame1.place(x=10, y=60)

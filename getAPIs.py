@@ -63,6 +63,9 @@ def get_equipment(name):
     response = requests.get(url, headers=headers)
     json_obj = response.json()
 
+    if json_obj is None:
+        return
+
     # OpenAPI 에서 값을 잘 불러왔는지 확인
     print('get_equipment status: '+str(response.status_code))
 

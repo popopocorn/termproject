@@ -6,6 +6,7 @@ import requests
 import json
 from lostark_api_token import Token
 
+
 class mainGUI():
     def __init__(self):
         self.window = Tk()
@@ -34,20 +35,28 @@ class mainGUI():
         self.frame1 = Frame(self.notebook, width=400, height=650, bg='black')
         self.frame1.place(x=10, y=60)
 
-        # img1 = PhotoImage(file='gn_f_item_182.png')
+        self.equipment_img_labels = []
+        self.equipment_name_labels = []
+        self.equipment_name_text_variables = []
+        self.equipment_quality_labels = []
+        self.equipment_quality_variables = []
+        for i in range(6):
+            self.equipment_img_labels.append(Label(self.frame1, width=64, height=64, bg='black'))
+            self.equipment_img_labels[-1].place(x=10, y=30+100*i)
 
-        lab1 = Label(self.frame1, width=64, height=64, bg='black')
-        lab1.place(x=10, y=30)
-        lab2 = Label(self.frame1, width=64, height=64, bg='black')
-        lab2.place(x=10, y=130)
-        lab3 = Label(self.frame1, width=64, height=64, bg='black')
-        lab3.place(x=10, y=230)
-        lab4 = Label(self.frame1, width=64, height=64, bg='black')
-        lab4.place(x=10, y=330)
-        lab5 = Label(self.frame1, width=64, height=64, bg='black')
-        lab5.place(x=10, y=430)
-        lab6 = Label(self.frame1, width=64, height=64, bg='black')
-        lab6.place(x=10, y=530)
+            self.equipment_name_text_variables.append(StringVar())
+            self.equipment_name_text_variables[i].set('')
+            self.equipment_name_labels.append(Label(self.frame1, width=40, height=1, bg='black', fg='white',
+                                                    font=('Arial', 14, 'bold'), anchor='w',
+                                                    textvariable=self.equipment_name_text_variables[i]))
+            self.equipment_name_labels[i].place(x=100, y=30+100*i)
+
+            self.equipment_quality_variables.append(IntVar())
+            self.equipment_quality_variables[i].set(0)
+            self.equipment_quality_labels.append(Label(self.frame1, width=10, bg='black', fg='black',
+                                                       font=('Arial', 12, 'bold'),
+                                                       textvariable=self.equipment_quality_variables[i]))
+            self.equipment_quality_labels[i].place(x=100, y=60 + 100 * i)
 
         self.frame2 = Frame(self.notebook, width=350, height=685, bg='black')
         self.frame2.place(x=420, y=25)
@@ -133,8 +142,8 @@ class mainGUI():
 
         self.char_image_canvas = Canvas(self.frame3, width=490, height=685, bg='black')
         self.char_image_canvas.pack()
-        #---------------------------------------------------------------------------------------
-        #캐릭터 검색 notebook 끝
+        # ---------------------------------------------------------------------------------------
+        # 캐릭터 검색 notebook 끝
         # ---------------------------------------------------------------------------------------
 
         # ---------------------------------------------------------------------------------------
@@ -179,7 +188,8 @@ class mainGUI():
         # ---------------------------------------------------------------------------------------
 
         self.window.mainloop()
-    #유저 이름 받기
+
+    # 유저 이름 받기
     def get_name(self):
         self.name = str(self.name_var.get())
         profile = get_profiles(self.name)
@@ -202,7 +212,49 @@ class mainGUI():
             self.vars[k].set(v)
         for k, v in self.tendency.items():
             self.vars[k].set(v)
-    #아이템 정보 표시#
+
+        if equipment is None:
+            return
+
+        for i in range(6):
+            icon_url = equipment[i]['icon']
+            img = url2PhotoImage(icon_url)
+            engrave = equipment[i]['engrave']
+            grade = equipment[i]['grade']
+            name = equipment[i]['type']
+            quality = int(equipment[i]['quality'])
+            temp_label = Label(self.frame1, image=img)
+            temp_label.image = img
+            color_dict = {'희귀': 'sky blue',
+                          '영웅': 'violet',
+                          '전설': 'gold',
+                          '유물': 'OrangeRed2',
+                          '고대': 'yellow',
+                          '에스더': 'cyan',
+                          }
+            if grade not in color_dict.keys():
+                bg_color = 'black'
+            else: bg_color = color_dict[grade]
+            self.equipment_img_labels[i].configure(image=img, bg=bg_color)
+            text = str(engrave)+' '+str(grade)+' '+str(name)
+            self.equipment_name_text_variables[i].set(text)
+            color = str()
+            if quality <= 10:
+                color = 'red'
+            elif quality < 30:
+                color = 'orange'
+            elif quality < 70:
+                color = 'green'
+            elif quality < 90:
+                color = 'blue'
+            elif quality < 100:
+                color = 'purple'
+            else:
+                color = 'gold'
+            self.equipment_quality_variables[i].set(quality)
+            self.equipment_quality_labels[i].configure(bg=color)
+
+    # 아이템 정보 표시 #
     def draw_info(self, item_id):
         url = "https://developer-lostark.game.onstove.com/markets/items/" + item_id
         response = requests.get(url, headers=headers)
@@ -229,7 +281,6 @@ class mainGUI():
         for date, avg_price in sorted(price.items()):
             x = x_spacing * (i + 1)
 
-
             normalized_price = (avg_price - min_price) / price_range if price_range != 0 else 0
             heightspot = normalized_price * height * 0.3
             y = y_offset - heightspot
@@ -246,14 +297,15 @@ class mainGUI():
             previous_x, previous_y = x, y
             i += 1
 
-    # 나머지 mainGUI 클래스는 동일
+    # 나머지 mainGUI class 는 동일
 
-    #선택된 아이템 표시
+    # 선택된 아이템 표시
     def show_selected_item(self, event):
         selected_index = self.item_info_listbox.curselection()
         if selected_index:
             selected_item = self.item_info_listbox.get(selected_index)
             item_id = self.items[selected_item]
             self.draw_info(item_id)
+
 
 mainGUI()

@@ -13,7 +13,7 @@ class mainGUI():
         self.window.title("Termproject")
         self.window.geometry("1280x720")
 
-        self.notebook=ttk.Notebook(self.window)
+        self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(expand=True, fill="both")
 
         # ---------------------------------------------------------------------------------------
@@ -57,6 +57,28 @@ class mainGUI():
                                                        font=('Arial', 10, 'bold'),
                                                        textvariable=self.equipment_quality_variables[i]))
             self.equipment_quality_labels[i].place(x=100, y=60 + 100 * i)
+
+        self.accessory_img_labels = []
+        self.accessory_name_labels = []
+        self.accessory_name_variables = []
+        self.accessory_quality_labels = []
+        self.accessory_quality_variables = []
+
+        for i in range(5):
+            self.accessory_img_labels.append(Label(self.frame1, width=64, height=64, bg='black'))
+            self.accessory_img_labels[i].place(x=430, y=30+100*i)
+            self.accessory_name_variables.append(StringVar())
+            self.accessory_name_variables[i].set('')
+            self.accessory_name_labels.append(Label(self.frame1, width=15, height=1, bg='black', fg='white',
+                                                    font=('Arial', 12, 'bold'),
+                                                    textvariable=self.accessory_name_variables[i], anchor='e'))
+            self.accessory_name_labels[i].place(x=420, y=30+100*i, anchor='e')
+            self.accessory_quality_variables.append(IntVar())
+            self.accessory_quality_variables[i].set(0)
+            self.accessory_quality_labels.append(Label(self.frame1, width=10, bg='black', fg='black',
+                                                       font=('Arial', 10, 'bold'),
+                                                       textvariable=self.accessory_quality_variables[i]))
+            self.accessory_quality_labels[i].place(x=420, y=60+100*i, anchor='e')
 
         self.frame2 = Frame(self.notebook, width=350, height=685, bg='black')
         self.frame2.place(x=570, y=25)
@@ -137,8 +159,8 @@ class mainGUI():
                                     fg='light gray', bg='black')
         self.labels['kind'].place(x=270, y=640)
 
-        self.frame3 = Frame(self.notebook, width=340, height=685, bg='black')
-        self.frame3.place(x=926, y=25)
+        self.frame3 = Frame(self.notebook, width=400, height=685)
+        self.frame3.place(x=930, y=25)
 
         self.char_image_canvas = Canvas(self.frame3, width=340, height=685, bg='black')
         self.char_image_canvas.pack()
@@ -216,29 +238,32 @@ class mainGUI():
         if equipment is None:
             return
 
+        color_dict = {'희귀': 'sky blue',
+                      '영웅': 'violet',
+                      '전설': 'gold',
+                      '유물': 'OrangeRed2',
+                      '고대': 'yellow',
+                      '에스더': 'cyan',
+                      }
+
         for i in range(6):
             icon_url = equipment[i]['icon']
             img = url2PhotoImage(icon_url)
-            engrave = equipment[i]['engrave']
+            reforge = equipment[i]['reforge']
             grade = equipment[i]['grade']
             name = equipment[i]['type']
             quality = int(equipment[i]['quality'])
             temp_label = Label(self.frame1, image=img)
             temp_label.image = img
-            color_dict = {'희귀': 'sky blue',
-                          '영웅': 'violet',
-                          '전설': 'gold',
-                          '유물': 'OrangeRed2',
-                          '고대': 'yellow',
-                          '에스더': 'cyan',
-                          }
+
             if grade not in color_dict.keys():
                 bg_color = 'black'
-            else: bg_color = color_dict[grade]
+            else:
+                bg_color = color_dict[grade]
+
             self.equipment_img_labels[i].configure(image=img, bg=bg_color)
-            text = str(engrave)+' '+str(grade)+' '+str(name)
+            text = str(reforge)+' '+str(grade)+' '+str(name)
             self.equipment_name_text_variables[i].set(text)
-            color = str()
             if quality <= 10:
                 color = 'red'
             elif quality < 30:
@@ -252,7 +277,43 @@ class mainGUI():
             else:
                 color = 'gold'
             self.equipment_quality_variables[i].set(quality)
-            self.equipment_quality_labels[i].configure(bg=color)
+            self.equipment_quality_labels[i].configure(bg=color, fg='white')
+
+        for i in range(6, 6+5):
+            icon_url = equipment[i]['icon']
+            img = url2PhotoImage(icon_url)
+            reforge = equipment[i]['reforge']
+            grade = equipment[i]['grade']
+            name = equipment[i]['type']
+            quality = int(equipment[i]['quality'])
+            temp_label = Label(self.frame1, image=img)
+            temp_label.image = img
+
+            if grade not in color_dict.keys():
+                bg_color = 'black'
+            else:
+                bg_color = color_dict[grade]
+
+            j = i - 6
+            self.accessory_img_labels[j].configure(image=img, bg=bg_color)
+            if name[-1] == '1':
+                name = name[:-1]
+            text = str(reforge) + ' ' + str(grade) + ' ' + str(name)
+            self.accessory_name_variables[j].set(text)
+            if quality <= 10:
+                color = 'red'
+            elif quality < 30:
+                color = 'orange'
+            elif quality < 70:
+                color = 'green'
+            elif quality < 90:
+                color = 'blue'
+            elif quality < 100:
+                color = 'purple'
+            else:
+                color = 'gold'
+            self.accessory_quality_variables[j].set(quality)
+            self.accessory_quality_labels[j].configure(bg=color, fg='white')
 
     # 아이템 정보 표시 #
     def draw_info(self, item_id):

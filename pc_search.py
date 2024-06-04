@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
-import pandas as pd
-import numpy as np
 import folium
-from folium.plugins import MiniMap
+
+
 import requests
+import googlemaps
 
 class GUI:
     def __init__(self):
@@ -23,9 +23,7 @@ class GUI:
 
         self.pc_info = Listbox(self.frame2, width=60, height=35)  # pc방 정보를 보여주는 listbox
         self.pc_info.grid(row=1, column=0, columnspan=2, padx=5, pady=10)
-
-        # 임시 리스트 항목 추가
-
+        self.pc_info.bind("<<ListboxSelect>>", self.on_pc_info_select)
 
         self.favorite_button = Button(self.frame2, text="즐겨찾기", command=self.add_to_favorites)  # 즐겨찾기 버튼
         self.favorite_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
@@ -36,20 +34,43 @@ class GUI:
         self.window.mainloop()
 
     def search_pc_room(self):
-        url = "https://dapi.kakao.com/v2/local/search/keyword.json"
+        map_url = "https://dapi.kakao.com/v2/local/search/keyword.json"
         map_headers = {"Authorization": "KakaoAK 846ccd607715f559334168534f07d9ef"}
         region = self.search_geo.get() + " pc방"
         params = {"query": region}
-        response = requests.get(url, params=params, headers=map_headers)
+        response = requests.get(map_url, params=params, headers=map_headers)
 
         if response.status_code == 200:
             data = response.json()
             self.pc_info.delete(0, END)  # 기존 목록 삭제
-            for place in data['documents']:
+            self.places = data['documents']
+            for place in self.places:
                 name = place['place_name']
                 self.pc_info.insert(END, name)  # 이름을 리스트 박스에 추가
         else:
             print("검색에 실패했습니다.")
+
+    def on_pc_info_select(self, event):
+        selected_index = self.pc_info.curselection()
+        if selected_index:
+            selected_index = selected_index[0]
+            selected_place = self.places[selected_index]
+            self.display_pc_room_info(selected_place)
+
+    def display_pc_room_info(self, place):
+
+        self.mapc.delete("all")
+
+        info = f"Name: {place['place_name']}\nAddress: {place['road_address_name']}\nPhone: {place['phone']}\n"
+        self.mapc.create_text(10, 10, anchor=NW, text=info, fill="white")
+        self.draw_maps(place['road_address_name'])
+    def draw_maps(self, gplace):
+        gmaps= googlemaps.Client(key='AIzaSyAENAWrvZxivNCPVCPlWZaYKLDXf9I80tY')
+        tmp = gmaps.geocode(str(gplace), language="ko")
+        lat = tmp[0].get("geometry")["location"]["lat"]
+        lng = tmp[0].get("geometry")["location"]["lng"]
+        map = folium.Map(location=[lat, lng], zoom_start=14)
+        map
     def add_to_favorites(self):
         selected_index = self.pc_info.curselection()
         if selected_index:

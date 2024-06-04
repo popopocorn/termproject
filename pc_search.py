@@ -63,14 +63,10 @@ class GUI:
 
         info = f"Name: {place['place_name']}\nAddress: {place['road_address_name']}\nPhone: {place['phone']}\n"
         self.mapc.create_text(10, 10, anchor=NW, text=info, fill="white")
-        self.draw_maps(place['road_address_name'])
-    def draw_maps(self, gplace):
-        gmaps= googlemaps.Client(key='AIzaSyAENAWrvZxivNCPVCPlWZaYKLDXf9I80tY')
-        tmp = gmaps.geocode(str(gplace), language="ko")
-        lat = tmp[0].get("geometry")["location"]["lat"]
-        lng = tmp[0].get("geometry")["location"]["lng"]
-        map = folium.Map(location=[lat, lng], zoom_start=14)
-        map
+        self.draw_maps(place['x'], place['y'])
+    def draw_maps(self, x, y):
+        
+
     def add_to_favorites(self):
         selected_index = self.pc_info.curselection()
         if selected_index:

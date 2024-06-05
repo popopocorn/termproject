@@ -25,7 +25,7 @@ class GUI:
         self.favorite_button = Button(self.frame5, text="즐겨찾기", command=self.add_to_favorites)  # 즐겨찾기 버튼
         self.favorite_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
-        self.map_widget = TkinterMapView(self.window, width=800, height=720, corner_radius=0)
+        self.map_widget = TkinterMapView(self.frame5, width=800, height=720, corner_radius=0)
         self.map_widget.pack(side=RIGHT, fill=BOTH, expand=True)
 
         self.window.mainloop()

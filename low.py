@@ -5,7 +5,7 @@ from getAPIs import *
 import requests
 import json
 from lostark_api_token import Token
-
+from tkintermapview import TkinterMapView
 
 class mainGUI():
     def __init__(self):
@@ -208,7 +208,29 @@ class mainGUI():
         # ---------------------------------------------------------------------------------------
         # 경매장 notebook 끝
         # ---------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------
+        # pc방 notebook 시작
+        # ---------------------------------------------------------------------------------------
+        self.frame5 = Frame(self.window)
+        self.frame5.pack(side=LEFT, anchor=W, padx=10, pady=10)
+        self.notebook.add(self.frame5, text="pc방 검색")
 
+        self.search_geo = Entry(self.frame5, width=30)  # 지역 검색창 entry
+        self.search_geo.grid(row=0, column=0, padx=5, pady=5)
+
+        self.geo_button = Button(self.frame5, text="검색", command=self.search_pc_room)  # 지역 검색 버튼
+        self.geo_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.pc_info = Listbox(self.frame5, width=60, height=35)  # pc방 정보를 보여주는 listbox
+        self.pc_info.grid(row=1, column=0, columnspan=2, padx=5, pady=10)
+        self.pc_info.bind("<<ListboxSelect>>", self.on_pc_info_select)
+
+        self.map_widget = TkinterMapView(self.frame5, width=800, height=720, corner_radius=0)
+        self.map_widget.grid(row=1, column=3, padx=10, pady=10, sticky=NSEW)
+
+        # ---------------------------------------------------------------------------------------
+        # pc방 notebook 끝
+        # ---------------------------------------------------------------------------------------
         self.window.mainloop()
 
     # 유저 이름 받기
@@ -358,7 +380,7 @@ class mainGUI():
             previous_x, previous_y = x, y
             i += 1
 
-    # 나머지 mainGUI class 는 동일
+
 
     # 선택된 아이템 표시
     def show_selected_item(self, event):
@@ -367,6 +389,36 @@ class mainGUI():
             selected_item = self.item_info_listbox.get(selected_index)
             item_id = self.items[selected_item]
             self.draw_info(item_id)
+    def search_pc_room(self):
+        map_url = "https://dapi.kakao.com/v2/local/search/keyword.json"
+        map_headers = {"Authorization": "KakaoAK 846ccd607715f559334168534f07d9ef"}
+        region = self.search_geo.get() + " pc방"
+        params = {"query": region}
+        response = requests.get(map_url, params=params, headers=map_headers)
 
+        if response.status_code == 200:
+            data = response.json()
+            self.pc_info.delete(0, END)  # 기존 목록 삭제
+            self.places = data['documents']
+            for place in self.places:
+                name = place['place_name']
+                self.pc_info.insert(END, name)  # 이름을 리스트 박스에 추가
+        else:
+            print("검색에 실패했습니다.")
+
+    def on_pc_info_select(self, event):
+        selected_index = self.pc_info.curselection()
+        if selected_index:
+            selected_index = selected_index[0]
+            selected_place = self.places[selected_index]
+            self.display_pc_room_info(selected_place)
+
+    def display_pc_room_info(self, place):
+        x = float(place['x'])
+        y = float(place['y'])
+        self.map_widget.set_position(y, x)
+        self.map_widget.set_zoom(15)
+        self.map_widget.delete_all_marker()
+        self.map_widget.set_marker(y, x, text=place['place_name'])
 
 mainGUI()

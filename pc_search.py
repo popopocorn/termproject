@@ -1,10 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-import folium
-
-
 import requests
-import googlemaps
+from tkintermapview import TkinterMapView
 
 class GUI:
     def __init__(self):
@@ -12,24 +9,24 @@ class GUI:
         self.window.title("Termproject")
         self.window.geometry("1280x720")
 
-        self.frame2 = Frame(self.window)
-        self.frame2.pack(anchor=W, padx=10, pady=10)
+        self.frame5 = Frame(self.window)
+        self.frame5.pack(side=LEFT, anchor=W, padx=10, pady=10)
 
-        self.search_geo = Entry(self.frame2, width=30)  # 지역 검색창 entry
+        self.search_geo = Entry(self.frame5, width=30)  # 지역 검색창 entry
         self.search_geo.grid(row=0, column=0, padx=5, pady=5)
 
-        self.geo_button = Button(self.frame2, text="검색", command=self.search_pc_room)  # 지역 검색 버튼
+        self.geo_button = Button(self.frame5, text="검색", command=self.search_pc_room)  # 지역 검색 버튼
         self.geo_button.grid(row=0, column=1, padx=5, pady=5)
 
-        self.pc_info = Listbox(self.frame2, width=60, height=35)  # pc방 정보를 보여주는 listbox
+        self.pc_info = Listbox(self.frame5, width=60, height=35)  # pc방 정보를 보여주는 listbox
         self.pc_info.grid(row=1, column=0, columnspan=2, padx=5, pady=10)
         self.pc_info.bind("<<ListboxSelect>>", self.on_pc_info_select)
 
-        self.favorite_button = Button(self.frame2, text="즐겨찾기", command=self.add_to_favorites)  # 즐겨찾기 버튼
+        self.favorite_button = Button(self.frame5, text="즐겨찾기", command=self.add_to_favorites)  # 즐겨찾기 버튼
         self.favorite_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
-        self.mapc = Canvas(self.frame2, width=1020, height=570, bg="black")
-        self.mapc.grid(row=1, column=2, columnspan=2, padx=5)
+        self.map_widget = TkinterMapView(self.window, width=800, height=720, corner_radius=0)
+        self.map_widget.pack(side=RIGHT, fill=BOTH, expand=True)
 
         self.window.mainloop()
 
@@ -58,14 +55,11 @@ class GUI:
             self.display_pc_room_info(selected_place)
 
     def display_pc_room_info(self, place):
-
-        self.mapc.delete("all")
-
-        info = f"Name: {place['place_name']}\nAddress: {place['road_address_name']}\nPhone: {place['phone']}\n"
-        self.mapc.create_text(10, 10, anchor=NW, text=info, fill="white")
-        self.draw_maps(place['x'], place['y'])
-    def draw_maps(self, x, y):
-        
+        x = float(place['x'])
+        y = float(place['y'])
+        self.map_widget.set_position(y, x)
+        self.map_widget.set_zoom(15)
+        self.map_widget.set_marker(y, x, text=place['place_name'])
 
     def add_to_favorites(self):
         selected_index = self.pc_info.curselection()

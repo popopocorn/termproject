@@ -8,8 +8,6 @@ headers = {
     'authorization': Token
 }
 
-# %ED%94%BC%EB%A9%94%EC%95%84%EB%8B%98/profiles'
-
 
 def get_profiles(name):
     url = 'https://developer-lostark.game.onstove.com/armories/characters/'+str(name)+'/profiles'
@@ -82,16 +80,18 @@ def get_equipment(name):
         grade = obj['Grade']
         icon = obj['Icon']
         if '+' in items[0]:
-            engrave = items[0]
+            reforge = items[0]
         else:
-            engrave = ''
+            reforge = ''
+        while typename in temp.keys():
+            typename += '1'
         temp[typename] = dict()
         temp[typename]['item'] = item
         temp[typename]['type'] = typename
         temp[typename]['quality'] = quality
         temp[typename]['grade'] = grade
         temp[typename]['icon'] = icon
-        temp[typename]['engrave'] = engrave
+        temp[typename]['reforge'] = reforge
 
     equipment.append(temp['투구'])
     equipment.append(temp['어깨'])
@@ -99,5 +99,11 @@ def get_equipment(name):
     equipment.append(temp['하의'])
     equipment.append(temp['장갑'])
     equipment.append(temp['무기'])
+
+    equipment.append(temp['목걸이'])
+    equipment.append(temp['귀걸이'])
+    equipment.append(temp['귀걸이1'])
+    equipment.append(temp['반지'])
+    equipment.append(temp['반지1'])
 
     return equipment

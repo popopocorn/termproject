@@ -1,3 +1,4 @@
+import threading
 from tkinter import *
 from tkinter import ttk
 from url_to_tkPhotoImage import url2PhotoImage
@@ -7,8 +8,37 @@ import json
 from lostark_api_token import Token
 from tkintermapview import TkinterMapView
 import telepot
+import time
+import traceback
+import noti
+import sys
+from pprint import pprint
+from datetime import date
+class TelegramBot:
+    def __init__(self):
+        self.bot = telepot.Bot(noti.TOKEN)
+        self.bot.message_loop(self.handle)
+    def handle(self, msg):
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        if content_type != 'text':
+            noti.send_message(chat_id, '잘못된 입력입니다.')
+            return
 
+        text = msg['text']
+        args = text.split(' ')
 
+        if text.startswith('시세') and len(args) > 1:
+            item_name = args[1]
+            if item_name in noti.ITEM_CODES:
+                item_code = noti.ITEM_CODES[item_name]
+                print(f'아이템 시세 조회: {item_name} ({item_code})')
+                market_data = noti.get_market_data(item_code)
+                formatted_data = noti.format_market_data(market_data)
+                noti.send_message(chat_id, formatted_data)
+            else:
+                noti.send_message(chat_id, '알 수 없는 아이템 이름입니다.')
+        else:
+            noti.send_message(chat_id, '모르는 명령어입니다.\n시세 [아이템 이름] 명령을 사용하세요.')
 class mainGUI():
     def __init__(self):
         self.window = Tk()
@@ -236,8 +266,19 @@ class mainGUI():
         # ---------------------------------------------------------------------------------------
         # 텔레그램 봇 시작
         # ---------------------------------------------------------------------------------------
+        telegram_thread = threading.Thread(target=self.start_telegram_bot())
+        telegram_thread.daemon=True
+        telegram_thread.start()
+
+
         self.window.mainloop()
 
+    def start_telegram_bot(self):
+        try:
+            bot = TelegramBot()
+        except Exception as e:
+            print(f"Error in Telegram bot: {e}")
+            traceback.print_exc()
     # 유저 이름 받기
     def get_name(self):
         self.name = str(self.name_var.get())
@@ -427,4 +468,7 @@ class mainGUI():
         self.map_widget.delete_all_marker()
         self.map_widget.set_marker(y, x, text=place['place_name'])
 
-mainGUI()
+
+if __name__ == "__main__":
+    mainGUI()
+

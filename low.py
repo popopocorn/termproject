@@ -14,10 +14,15 @@ import noti
 import sys
 from pprint import pprint
 from datetime import date
+from PIL import ImageGrab
+from send_email import *
+
+
 class TelegramBot:
     def __init__(self):
         self.bot = telepot.Bot(noti.TOKEN)
         self.bot.message_loop(self.handle)
+
     def handle(self, msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
         if content_type != 'text':
@@ -39,6 +44,8 @@ class TelegramBot:
                 noti.send_message(chat_id, '알 수 없는 아이템 이름입니다.')
         else:
             noti.send_message(chat_id, '모르는 명령어입니다.\n시세 [아이템 이름] 명령을 사용하세요.')
+
+
 class mainGUI():
     def __init__(self):
         self.window = Tk()
@@ -237,6 +244,12 @@ class mainGUI():
         self.mapc = Canvas(self.frame4, width=1020, height=570, bg="white")
         self.mapc.grid(row=1, column=2, columnspan=2, padx=5)
 
+        # 이메일 발송을 위한 버튼 제작 (2024.06.07)
+        self.email_button = Button(self.frame4, text='이메일 전송', font=('Arial', 16, 'bold'), bg='white',
+                                   command=self.email_b_pressed)
+        self.email_button.grid(row=2, column=1)
+        self.email_button['state'] = 'disable'
+
         # ---------------------------------------------------------------------------------------
         # 경매장 notebook 끝
         # ---------------------------------------------------------------------------------------
@@ -383,8 +396,7 @@ class mainGUI():
             self.accessory_quality_variables[j].set(quality)
             self.accessory_quality_labels[j].configure(bg=color, fg='white')
 
-
-    # 아이템 정보 표시 #
+    # 아이템 정보 표시
     def draw_info(self, item_id):
         url = "https://developer-lostark.game.onstove.com/markets/items/" + item_id
         response = requests.get(url, headers=headers)
@@ -427,8 +439,6 @@ class mainGUI():
             previous_x, previous_y = x, y
             i += 1
 
-
-
     # 선택된 아이템 표시
     def show_selected_item(self, event):
         selected_index = self.item_info_listbox.curselection()
@@ -436,6 +446,9 @@ class mainGUI():
             selected_item = self.item_info_listbox.get(selected_index)
             item_id = self.items[selected_item]
             self.draw_info(item_id)
+            # 인덱스 선택시 이메일 버튼 활성화
+            self.email_button['state'] = 'active'
+
     def search_pc_room(self):
         map_url = "https://dapi.kakao.com/v2/local/search/keyword.json"
         map_headers = {"Authorization": "KakaoAK 846ccd607715f559334168534f07d9ef"}
@@ -467,6 +480,26 @@ class mainGUI():
         self.map_widget.set_zoom(15)
         self.map_widget.delete_all_marker()
         self.map_widget.set_marker(y, x, text=place['place_name'])
+
+    # 이메일 버튼 눌림
+    def email_b_pressed(self):
+        selected_index = self.item_info_listbox.curselection()
+        if selected_index:
+            selected_item = self.item_info_listbox.get(selected_index)
+            # 캔버스 -> 이미지 파일로
+            x = self.window.winfo_rootx() + self.mapc.winfo_x()
+            y = self.window.winfo_rooty() + self.mapc.winfo_y()
+            x1 = x + self.mapc.winfo_width()
+            y1 = y + self.mapc.winfo_height()
+            filename = 'graph.png'
+            ImageGrab.grab().crop((x, y, x1, y1)).save(filename)
+            print(f'이미지 저장: \'{filename}\'')
+            receiver = 'ahw8670@naver.com'
+            suc = send_email(str(selected_item)+' 그래프', str(selected_item), receiver)
+            if suc:
+                print('이메일이 성공적으로 보내졌습니다.')
+        else:
+            print('에러: 선택된 아이템이 없습니다!')
 
 
 if __name__ == "__main__":

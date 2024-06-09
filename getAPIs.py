@@ -2,10 +2,12 @@ import requests
 from lostark_api_token import Token
 from urllib import parse
 import json
+from LoaJWTMaker import *
+
 
 headers = {
     'accept': 'application/json',
-    'authorization': Token
+    'authorization': makeKeyFromStr(Token)
 }
 
 

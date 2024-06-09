@@ -6,6 +6,8 @@ import requests
 import json
 from lostark_api_token import Token
 from tkintermapview import TkinterMapView
+import telepot
+
 
 class mainGUI():
     def __init__(self):
@@ -231,6 +233,9 @@ class mainGUI():
         # ---------------------------------------------------------------------------------------
         # pc방 notebook 끝
         # ---------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------
+        # 텔레그램 봇 시작
+        # ---------------------------------------------------------------------------------------
         self.window.mainloop()
 
     # 유저 이름 받기
@@ -336,6 +341,7 @@ class mainGUI():
                 color = 'gold'
             self.accessory_quality_variables[j].set(quality)
             self.accessory_quality_labels[j].configure(bg=color, fg='white')
+
 
     # 아이템 정보 표시 #
     def draw_info(self, item_id):

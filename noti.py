@@ -13,7 +13,7 @@ from lostark_api_token import Token
 MAX_MSG_LENGTH = 300
 headers = {
     'accept': 'application/json',
-    'authorization': Token
+    'authorization': "bearer " + Token
 }
 TOKEN = '7136216320:AAGACewrMFFDf3_XtqylY4zCAWOI24xV9oY'
 bot = telepot.Bot(TOKEN)

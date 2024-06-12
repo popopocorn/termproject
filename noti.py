@@ -8,12 +8,12 @@ import telepot
 import traceback
 from datetime import datetime
 from lostark_api_token import Token
-
+from getAPIs import *
 
 MAX_MSG_LENGTH = 300
 headers = {
     'accept': 'application/json',
-    'authorization': "bearer " + Token
+    'authorization': makeKeyFromStr(Token)
 }
 TOKEN = '7136216320:AAGACewrMFFDf3_XtqylY4zCAWOI24xV9oY'
 bot = telepot.Bot(TOKEN)

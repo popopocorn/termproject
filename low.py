@@ -495,7 +495,7 @@ class mainGUI():
             ImageGrab.grab().crop((x, y, x1, y1)).save(filename)
             print(f'이미지 저장: \'{filename}\'')
             receiver = 'ahw8670@naver.com'
-            suc = send_email(str(selected_item)+' 그래프', str(selected_item), receiver)
+            suc = send_email(receiver, str(selected_item)+' 그래프', str(selected_item))
             if suc:
                 print('이메일이 성공적으로 보내졌습니다.')
         else:
